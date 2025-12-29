@@ -1,0 +1,45 @@
+# Developer-friendly docker compose (DO NOT USE FOR PROD)
+# Provides the API plus optional dependencies. Copy or adjust as needed.
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.api
+    container_name: cortex_api_dev
+    env_file: ../.env
+    ports:
+      - "8000:8088"  # external:internal (uvicorn listens on 8088)
+    # Example overrides (uncomment and set values):
+    # environment:
+    #   CKA_LLM_PROVIDER: "Fake"   # or HF
+    #   HF_API_KEY: "${HF_API_KEY}"  # supply via host env or .env
+    restart: unless-stopped
+
+  # Uncomment to enable Redis cache
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: cortex_redis_dev
+  #   ports:
+  #     - "6379:6379"
+  #   environment:
+  #     # Toggle Redis usage via CKA_USE_REDIS=true in .env
+  #     # no additional env vars required unless auth enabled
+  #   restart: unless-stopped
+
+  # Uncomment to enable Qdrant vector store
+  # qdrant:
+  #   image: qdrant/qdrant:latest
+  #   container_name: cortex_qdrant_dev
+  #   ports:
+  #     - "6333:6333"
+  #   environment:
+  #     # Use CKA_USE_QDRANT=true and CKA_QDRANT_URL=http://qdrant:6333
+  #     # Optionally set CKA_QDRANT_API_KEY if Qdrant auth is enabled
+  #   restart: unless-stopped
+
+# networks:
+#   default:
+#     name: cortex_dev_net
+#     driver: bridge

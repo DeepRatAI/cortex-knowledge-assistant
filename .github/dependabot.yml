@@ -1,0 +1,53 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - Configuración de Dependabot
+# ══════════════════════════════════════════════════════════════════════════════
+# Solo verifica actualizaciones de SEGURIDAD (vulnerabilidades conocidas)
+# No crea PRs para actualizaciones de versión regulares
+# ══════════════════════════════════════════════════════════════════════════════
+
+version: 2
+
+# Dependabot security updates están habilitadas por defecto en GitHub
+# Este archivo configura solo las alertas de seguridad, no actualizaciones de versión
+
+updates:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # Python Dependencies - Solo seguridad
+  # ─────────────────────────────────────────────────────────────────────────────
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    labels:
+      - "security"
+      - "dependencies"
+    commit-message:
+      prefix: "security(python):"
+    # Solo actualizaciones de seguridad - ignorar todo lo demás
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # GitHub Actions - Solo seguridad
+  # ─────────────────────────────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
+    labels:
+      - "security"
+      - "dependencies"
+    commit-message:
+      prefix: "security(actions):"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"

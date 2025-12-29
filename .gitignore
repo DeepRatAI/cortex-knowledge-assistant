@@ -1,0 +1,119 @@
+# ═══════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - .gitignore
+# ═══════════════════════════════════════════════════════════════════
+
+# ─── Python ───────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ─── Virtual Environment ──────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+
+# ─── IDE / Editor ─────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# ─── Environment & Secrets ────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# ─── Databases (Runtime) ──────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+login.db
+
+# ─── Logs ─────────────────────────────────────────────────────────
+*.log
+logs/
+api.log
+uvicorn.log
+
+# ─── Qdrant Storage (Runtime) ─────────────────────────────────────
+qdrant_storage/
+
+# ─── Node.js (UI) ─────────────────────────────────────────────────
+node_modules/
+ui/node_modules/
+ui/.next/
+ui/dist/
+.npm
+.yarn
+
+# ─── Test & Coverage ──────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# ─── OS Files ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Temp & Misc ──────────────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+nohup.out
+*.zip
+*.pdf
+informe_perplexity.md
+token.txt
+
+# ─── Virtual Environments (all patterns) ──────────────────────────
+.venv*/
+venv*/
+.env.backup*
+
+# ─── Internal/Development Files ───────────────────────────────────
+retomar/
+analisis_cortex/
+documentacion/
+documentacion_sintetica/
+quitado/
+*.firstrun.yml
+
+# ─── Demo/Sample Data (not for public repo) ───────────────────────
+corpus_bancario_completo.jsonl
+
+# ─── Backup files ─────────────────────────────────────────────────
+backups/
+*.sql.gz
+*.snapshot
+token.txt

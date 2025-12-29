@@ -1,0 +1,50 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - Code Owners
+# ══════════════════════════════════════════════════════════════════════════════
+# This file defines who is responsible for code review in different areas.
+# When a PR modifies files matching a pattern, the listed owners are
+# automatically requested for review.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Default Owner - All files unless overridden below
+# ─────────────────────────────────────────────────────────────────────────────
+*                                   @DeepRatAI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Core Application
+# ─────────────────────────────────────────────────────────────────────────────
+/src/cortex_ka/                     @DeepRatAI
+/src/cortex_ka/api/                 @DeepRatAI
+/src/cortex_ka/core/                @DeepRatAI
+/src/cortex_ka/services/            @DeepRatAI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security-Sensitive Areas (require explicit review)
+# ─────────────────────────────────────────────────────────────────────────────
+/src/cortex_ka/auth/                @DeepRatAI
+/src/cortex_ka/security/            @DeepRatAI
+SECURITY.md                         @DeepRatAI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Infrastructure & DevOps
+# ─────────────────────────────────────────────────────────────────────────────
+/docker/                            @DeepRatAI
+docker-compose*.yml                 @DeepRatAI
+/k8s/                               @DeepRatAI
+/.github/workflows/                 @DeepRatAI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Documentation
+# ─────────────────────────────────────────────────────────────────────────────
+/docs/                              @DeepRatAI
+README.md                           @DeepRatAI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Configuration & Dependencies
+# ─────────────────────────────────────────────────────────────────────────────
+pyproject.toml                      @DeepRatAI
+requirements*.txt                   @DeepRatAI
+/.github/dependabot.yml             @DeepRatAI

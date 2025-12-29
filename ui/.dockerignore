@@ -1,0 +1,29 @@
+# Dependencies (will be installed fresh in container)
+node_modules/
+
+# Build output (will be built fresh)
+dist/
+
+# Development files
+.git/
+.gitignore
+*.md
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+coverage/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+vitest.setup.ts
+
+# Environment files (not needed for Docker build)
+.env
+.env.local
+.env.*.local

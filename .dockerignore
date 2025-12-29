@@ -1,0 +1,144 @@
+# Cortex Docker Ignore
+# Optimizes build context for faster Docker builds
+
+# ===================
+# Version Control
+# ===================
+.git
+.gitignore
+.gitattributes
+
+# ===================
+# IDE & Editor
+# ===================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ===================
+# Python
+# ===================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env.local
+.env.*.local
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# ===================
+# Documentation
+# ===================
+docs/_build/
+*.md
+!README.md
+
+# ===================
+# Node.js (UI)
+# ===================
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/coverage/
+ui/.npm
+ui/*.log
+
+# ===================
+# Project Specific
+# ===================
+# Analysis and temp files
+analisis_cortex/
+*.log
+*.tmp
+*.temp
+
+# Local data (use volumes instead)
+data/
+*.db
+*.sqlite3
+!tests/fixtures/*.db
+
+# Qdrant storage (use volumes)
+qdrant_storage/
+storage/
+
+# ===================
+# CI/CD
+# ===================
+.github/
+.circleci/
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# ===================
+# Development
+# ===================
+Makefile
+docker-compose*.yml
+!docker-compose.yml
+*.sh
+scripts/
+tests/
+k8s/
+docker/
+
+# ===================
+# Misc
+# ===================
+*.tar
+*.tar.gz
+*.zip
+Thumbs.db
+
+# ===================
+# Secrets (NEVER include)
+# ===================
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.crt
+backups/

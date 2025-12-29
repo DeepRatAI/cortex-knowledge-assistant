@@ -1,0 +1,325 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - CLI Management Tool
+# ══════════════════════════════════════════════════════════════════════════════
+# Author: Gonzalo Romero - DeepRat
+# Usage: ./cortex {start|stop|restart|logs|status|reset|dev}
+# ══════════════════════════════════════════════════════════════════════════════
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Helper Functions
+# ─────────────────────────────────────────────────────────────────────────────
+
+print_banner() {
+    echo -e "${CYAN}"
+    echo "   ██████╗ ██████╗ ██████╗ ████████╗███████╗██╗  ██╗"
+    echo "  ██╔════╝██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝╚██╗██╔╝"
+    echo "  ██║     ██║   ██║██████╔╝   ██║   █████╗   ╚███╔╝ "
+    echo "  ██║     ██║   ██║██╔══██╗   ██║   ██╔══╝   ██╔██╗ "
+    echo "  ╚██████╗╚██████╔╝██║  ██║   ██║   ███████╗██╔╝ ██╗"
+    echo "   ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝"
+    echo -e "${NC}"
+    echo -e "  ${BLUE}Enterprise RAG Knowledge Assistant${NC}"
+    echo -e "  ${YELLOW}by Gonzalo Romero - DeepRat${NC}"
+    echo ""
+}
+
+check_docker() {
+    if ! command -v docker &> /dev/null; then
+        echo -e "${RED}✗ Docker is not installed${NC}"
+        echo "  Please install Docker: https://docs.docker.com/get-docker/"
+        exit 1
+    fi
+    
+    if ! docker info &> /dev/null; then
+        echo -e "${RED}✗ Docker daemon is not running${NC}"
+        echo "  Please start Docker and try again"
+        exit 1
+    fi
+}
+
+check_env() {
+    if [ ! -f ".env" ]; then
+        echo -e "${YELLOW}⚠ No .env file found${NC}"
+        echo ""
+        if [ -f ".env.example" ]; then
+            echo -e "Creating .env from template..."
+            cp .env.example .env
+            echo -e "${GREEN}✓ Created .env file${NC}"
+            echo ""
+            echo -e "${YELLOW}IMPORTANT: Edit .env and add your HuggingFace API key:${NC}"
+            echo -e "  ${CYAN}HF_API_KEY=your_key_here${NC}"
+            echo ""
+            echo "Get your free API key at: https://huggingface.co/settings/tokens"
+            echo ""
+            read -p "Press Enter after configuring .env, or Ctrl+C to cancel..."
+        else
+            echo -e "${RED}✗ No .env.example template found${NC}"
+            exit 1
+        fi
+    fi
+    
+    # Check if HF_API_KEY is set
+    if grep -q "HF_API_KEY=your_huggingface_api_key_here" .env 2>/dev/null || \
+       grep -q "HF_API_KEY=$" .env 2>/dev/null; then
+        echo -e "${YELLOW}⚠ HF_API_KEY is not configured in .env${NC}"
+        echo "  Please edit .env and add your HuggingFace API key"
+        echo "  Get your free key at: https://huggingface.co/settings/tokens"
+        exit 1
+    fi
+}
+
+wait_for_health() {
+    local service=$1
+    local url=$2
+    local max_attempts=30
+    local attempt=1
+    
+    echo -n "  Waiting for $service"
+    while [ $attempt -le $max_attempts ]; do
+        if curl -sf "$url" > /dev/null 2>&1; then
+            echo -e " ${GREEN}✓${NC}"
+            return 0
+        fi
+        echo -n "."
+        sleep 2
+        ((attempt++))
+    done
+    echo -e " ${RED}✗${NC}"
+    return 1
+}
+
+open_browser() {
+    local url=$1
+    if command -v xdg-open &>/dev/null; then
+        xdg-open "$url" 2>/dev/null &
+    elif command -v open &>/dev/null; then
+        open "$url" 2>/dev/null &
+    fi
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Commands
+# ─────────────────────────────────────────────────────────────────────────────
+
+cmd_start() {
+    print_banner
+    check_docker
+    check_env
+    
+    echo -e "${BLUE}🚀 Starting Cortex...${NC}"
+    echo ""
+    
+    # Build and start containers
+    docker compose up -d --build
+    
+    echo ""
+    echo -e "${BLUE}⏳ Waiting for services to be healthy...${NC}"
+    
+    # Wait for services
+    wait_for_health "Qdrant" "http://localhost:6333/healthz" || true
+    wait_for_health "API" "http://localhost:8088/health" || true
+    wait_for_health "UI" "http://localhost:3000" || true
+    
+    echo ""
+    echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}"
+    echo -e "${GREEN}✓ Cortex is running!${NC}"
+    echo -e "${GREEN}════════════════════════════════════════════════════════════${NC}"
+    echo ""
+    echo -e "  ${CYAN}🌐 Open in browser:${NC} http://localhost:3000"
+    echo ""
+    echo -e "  ${YELLOW}First time?${NC} Create your admin account in the UI"
+    echo ""
+    echo -e "  ${BLUE}Commands:${NC}"
+    echo "    ./cortex logs    - View logs"
+    echo "    ./cortex status  - Check status"
+    echo "    ./cortex stop    - Stop Cortex"
+    echo ""
+    
+    # Try to open browser
+    open_browser "http://localhost:3000"
+}
+
+cmd_stop() {
+    print_banner
+    echo -e "${YELLOW}🛑 Stopping Cortex...${NC}"
+    docker compose down
+    echo -e "${GREEN}✓ Cortex stopped${NC}"
+}
+
+cmd_restart() {
+    cmd_stop
+    echo ""
+    cmd_start
+}
+
+cmd_logs() {
+    docker compose logs -f --tail=100
+}
+
+cmd_status() {
+    print_banner
+    echo -e "${BLUE}📊 Service Status:${NC}"
+    echo ""
+    docker compose ps
+    echo ""
+    
+    # Health checks
+    echo -e "${BLUE}🏥 Health Checks:${NC}"
+    echo ""
+    
+    if curl -sf http://localhost:6333/healthz > /dev/null 2>&1; then
+        echo -e "  Qdrant:  ${GREEN}✓ healthy${NC}"
+    else
+        echo -e "  Qdrant:  ${RED}✗ not responding${NC}"
+    fi
+    
+    if curl -sf http://localhost:8088/health > /dev/null 2>&1; then
+        echo -e "  API:     ${GREEN}✓ healthy${NC}"
+    else
+        echo -e "  API:     ${RED}✗ not responding${NC}"
+    fi
+    
+    if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+        echo -e "  UI:      ${GREEN}✓ healthy${NC}"
+    else
+        echo -e "  UI:      ${RED}✗ not responding${NC}"
+    fi
+    echo ""
+}
+
+cmd_reset() {
+    print_banner
+    echo -e "${RED}⚠ WARNING: This will delete all data!${NC}"
+    echo ""
+    echo "This will remove:"
+    echo "  - All users and authentication data"
+    echo "  - All chat history"
+    echo "  - Vector database content"
+    echo ""
+    read -p "Are you sure? Type 'yes' to confirm: " confirm
+    
+    if [ "$confirm" != "yes" ]; then
+        echo "Cancelled."
+        exit 0
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}🗑️ Resetting Cortex...${NC}"
+    
+    # Stop containers and remove volumes
+    docker compose down -v
+    
+    # Remove local database if exists
+    rm -f login.db cortex_logins.db 2>/dev/null || true
+    
+    echo -e "${GREEN}✓ Cortex has been reset${NC}"
+    echo ""
+    echo "Run './cortex start' to start fresh"
+}
+
+cmd_dev() {
+    # Development mode - run without Docker
+    print_banner
+    echo -e "${BLUE}🔧 Development Mode${NC}"
+    echo ""
+    echo "Starting services for local development..."
+    echo ""
+    
+    # Check for virtual environment
+    if [ -d ".venv" ]; then
+        source .venv/bin/activate
+    fi
+    
+    # Start infrastructure (Qdrant, Redis) with Docker
+    docker compose up -d qdrant redis
+    
+    echo ""
+    echo -e "${YELLOW}Infrastructure started. Now run in separate terminals:${NC}"
+    echo ""
+    echo -e "  ${CYAN}Terminal 1 (API):${NC}"
+    echo "    source .venv/bin/activate"
+    echo "    uvicorn src.cortex_ka.api.main:app --reload --port 8088"
+    echo ""
+    echo -e "  ${CYAN}Terminal 2 (UI):${NC}"
+    echo "    cd ui && npm run dev"
+    echo ""
+}
+
+cmd_ui() {
+    open_browser "http://localhost:3000"
+    echo "Opening http://localhost:3000 in browser..."
+}
+
+cmd_help() {
+    print_banner
+    echo "Usage: ./cortex <command>"
+    echo ""
+    echo "Commands:"
+    echo "  start     Start Cortex (builds containers if needed)"
+    echo "  stop      Stop all Cortex services"
+    echo "  restart   Restart all services"
+    echo "  logs      Follow container logs"
+    echo "  status    Show service status and health"
+    echo "  reset     Delete all data and start fresh"
+    echo "  dev       Start infrastructure for development"
+    echo "  ui        Open UI in browser"
+    echo "  help      Show this help message"
+    echo ""
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────────────────────
+
+case "${1:-}" in
+    start)
+        cmd_start
+        ;;
+    stop)
+        cmd_stop
+        ;;
+    restart)
+        cmd_restart
+        ;;
+    logs)
+        cmd_logs
+        ;;
+    status)
+        cmd_status
+        ;;
+    reset)
+        cmd_reset
+        ;;
+    dev)
+        cmd_dev
+        ;;
+    ui)
+        cmd_ui
+        ;;
+    help|--help|-h)
+        cmd_help
+        ;;
+    "")
+        cmd_help
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $1${NC}"
+        echo "Use './cortex help' for available commands."
+        exit 1
+        ;;
+esac

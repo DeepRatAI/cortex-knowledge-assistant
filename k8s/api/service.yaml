@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cka-api
+  labels:
+    app: cka-api
+spec:
+  type: ClusterIP
+  selector:
+    app: cka-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8088

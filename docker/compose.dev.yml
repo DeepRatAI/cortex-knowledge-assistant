@@ -1,0 +1,45 @@
+# Developer oriented docker compose (not for production)
+# Usage: docker compose -f docker/compose.dev.yml up --build
+# Optional services redis & qdrant can be uncommented and toggled via .env flags.
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: cortex_api_dev
+    env_file: ../.env
+    environment:
+      # Provide explicit fallbacks if .env missing values
+      - CKA_LLM_PROVIDER=${CKA_LLM_PROVIDER:-Fake}
+      - CKA_ENABLE_STREAMING=${CKA_ENABLE_STREAMING:-false}
+      - CKA_USE_QDRANT=${CKA_USE_QDRANT:-false}
+      - CKA_USE_REDIS=${CKA_USE_REDIS:-false}
+    ports:
+      - "8000:8088"  # host:container
+    restart: unless-stopped
+    # Uncomment depends_on entries if enabling services below
+    # depends_on:
+    #   - qdrant
+    #   - redis
+
+  # Qdrant vector database (optional)
+  # qdrant:
+  #   image: qdrant/qdrant:latest
+  #   container_name: cortex_qdrant_dev
+  #   ports:
+  #     - "6333:6333"
+  #   restart: unless-stopped
+
+  # Redis cache (optional)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: cortex_redis_dev
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+
+# Notes:
+# - Adjust port mappings if conflicts (change host side e.g. 8001:8088).
+# - Ensure HF_API_KEY is set in .env when using Hugging Face provider.
+# - Remove comments around qdrant/redis to enable real retrieval & caching.

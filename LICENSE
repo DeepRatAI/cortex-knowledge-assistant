@@ -1,0 +1,75 @@
+# Cortex Knowledge Assistant - Dual License
+
+Copyright (c) 2025 DeepRatAI
+
+This software is available under a **dual license model**:
+
+## 1. Open Source License (AGPL-3.0)
+
+For non-commercial use, academic research, personal projects, and open source
+contributions, Cortex Knowledge Assistant is licensed under the
+**GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+See [LICENSE-AGPL](./LICENSE-AGPL) for the full license text.
+
+### What this means:
+
+✅ **You CAN:**
+
+- Use Cortex for personal projects
+- Use Cortex for academic/educational purposes
+- Modify and distribute Cortex
+- Use Cortex internally within your organization (without distributing)
+
+⚠️ **You MUST:**
+
+- Disclose your source code if you distribute modified versions
+- Disclose your source code if you offer Cortex as a network service (SaaS)
+- Include the original copyright and license notices
+- State significant changes made to the software
+
+## 2. Commercial License
+
+For commercial use, proprietary applications, or if you cannot comply with
+the AGPL-3.0 requirements, a **Commercial License** is available.
+
+See [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md) for details.
+
+### Commercial use includes:
+
+- Selling Cortex or products based on Cortex
+- Offering Cortex as a paid service (SaaS) without source disclosure
+- Integrating Cortex into proprietary/closed-source products
+- Using Cortex in a commercial product without AGPL obligations
+
+### To obtain a Commercial License:
+
+📧 Contact: **deeprat.tec@gmail.com**
+
+---
+
+## Quick Reference
+
+| Use Case                                | License Required   |
+| --------------------------------------- | ------------------ |
+| Personal/hobby project                  | AGPL-3.0 (free)    |
+| Academic research                       | AGPL-3.0 (free)    |
+| Internal business use (no distribution) | AGPL-3.0 (free)    |
+| Open source project (AGPL-compatible)   | AGPL-3.0 (free)    |
+| SaaS offering (source disclosed)        | AGPL-3.0 (free)    |
+| SaaS offering (source NOT disclosed)    | Commercial License |
+| Proprietary/closed-source product       | Commercial License |
+| Selling Cortex or derivatives           | Commercial License |
+
+---
+
+## Third-Party Components
+
+This software includes third-party open source components, each with their
+own licenses. See the documentation for details.
+
+---
+
+**Cortex Knowledge Assistant** is developed and maintained by **DeepRatAI**.
+
+Website: https://cortex.deeprat.tech

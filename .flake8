@@ -1,0 +1,26 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E203, E501, E704, E731, W503, C901
+max-complexity = 25
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    build,
+    dist,
+    *.egg-info
+per-file-ignores =
+    # Re-exports in __init__.py
+    **/__init__.py: F401
+    # FastAPI endpoint discovery imports
+    src/cortex_ka/api/main.py: F401, F811, F841
+    # Application layer - some imports for type hints or future use
+    src/cortex_ka/application/*.py: F401
+    # Demo/seed files - unused vars acceptable in data generation
+    src/cortex_ka/demos/*.py: F401, F841
+    # System utilities
+    src/cortex_ka/system/*.py: F401
+    # Infrastructure - complex retrieval logic
+    src/cortex_ka/infrastructure/*.py: F401
+    # Scripts
+    src/cortex_ka/scripts/*.py: F401

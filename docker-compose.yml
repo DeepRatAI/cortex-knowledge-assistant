@@ -1,0 +1,195 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - Production Docker Compose
+# ══════════════════════════════════════════════════════════════════════════════
+# One-command deployment: docker compose up -d
+# Author: DeepRatAI - https://github.com/DeepRatAI
+# ══════════════════════════════════════════════════════════════════════════════
+
+name: cortex
+
+services:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Cortex API - FastAPI Backend
+  # ═══════════════════════════════════════════════════════════════════════════
+  cortex-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: cortex_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Override for container networking
+      - CKA_QDRANT_URL=http://qdrant:6333
+      - CKA_REDIS_HOST=redis
+      - CKA_CORS_ORIGINS=http://localhost:3000,http://localhost,http://cortex-ui
+      # PostgreSQL connection
+      - DATABASE_URL=postgresql+psycopg://cortex:${POSTGRES_PASSWORD:-cortex_change_me}@postgres:5432/cortex
+    volumes:
+      # Persist application data (logs, uploads, etc.)
+      - cortex_data:/app/data
+    ports:
+      - "8088:8088"  # Exponer para testing
+    expose:
+      - "8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - cortex-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Cortex UI - React Frontend (Nginx)
+  # ═══════════════════════════════════════════════════════════════════════════
+  cortex-ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      args:
+        # Demo domain: banking (default), university, clinic
+        VITE_DEMO_DOMAIN: ${VITE_DEMO_DOMAIN:-banking}
+        # Demo mode: none, fce_iuc, firstrun, banking_demo
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-none}
+        # Show demo reset timer: true/false
+        VITE_DEMO_RESET_ENABLED: ${VITE_DEMO_RESET_ENABLED:-false}
+    container_name: cortex_ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      cortex-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cortex-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Qdrant - Vector Database
+  # ═══════════════════════════════════════════════════════════════════════════
+  qdrant:
+    image: qdrant/qdrant:v1.12.1
+    container_name: cortex_qdrant
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__LOG_LEVEL=INFO
+      - QDRANT__SERVICE__HTTP_PORT=6333
+    expose:
+      - "6333"
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/6333' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cortex-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PostgreSQL - Transactional Database
+  # ═══════════════════════════════════════════════════════════════════════════
+  postgres:
+    image: postgres:16-alpine
+    container_name: cortex_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cortex
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cortex_change_me}
+      POSTGRES_DB: cortex
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cortex -d cortex"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - cortex-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Redis - Cache & Session Store
+  # ═══════════════════════════════════════════════════════════════════════════
+  redis:
+    image: redis:7-alpine
+    container_name: cortex_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - cortex-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Networks
+# ═══════════════════════════════════════════════════════════════════════════════
+networks:
+  cortex-network:
+    driver: bridge
+    name: cortex_network
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Volumes - Persistent storage
+# ═══════════════════════════════════════════════════════════════════════════════
+volumes:
+  cortex_data:
+    name: cortex_data
+  postgres_data:
+    name: cortex_postgres_data
+  qdrant_data:
+    name: cortex_qdrant_data
+  redis_data:
+    name: cortex_redis_data

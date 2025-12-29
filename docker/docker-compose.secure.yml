@@ -1,0 +1,57 @@
+version: "3.9"
+
+# Hardened runtime docker-compose for controlled environments (pre-prod/prod-like).
+# NOTE: This file is an example; adapt images, secrets sourcing, and TLS termination
+# to your infrastructure. Do NOT hardcode real secrets here.
+
+networks:
+  cka_internal:
+    driver: bridge
+
+services:
+  api:
+    image: cka-api:latest  # built and pushed by CI/CD pipeline
+    container_name: cka_api
+    env_file:
+      - ../.env  # in real deployments prefer orchestrator-managed secrets/config
+    environment:
+      CKA_HTTPS_ENABLED: "true"
+      # Restrict CORS to trusted origins (example: internal portal)
+      CKA_CORS_ORIGINS: "https://intranet.bank.corp"
+    ports:
+      # In many banks, this would NOT be exposed directly, but fronted by a
+      # reverse proxy / API gateway that terminates TLS.
+      - "8088:8088"
+    restart: unless-stopped
+    depends_on:
+      - qdrant
+      - redis
+    networks:
+      - cka_internal
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: cka_qdrant
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+      # For Qdrant auth, configure its own API key mechanism and wire it into
+      # CKA_QDRANT_API_KEY via orchestrator secrets.
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    networks:
+      - cka_internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: cka_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - cka_internal
+
+volumes:
+  qdrant_data:
+  redis_data:

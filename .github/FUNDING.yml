@@ -1,0 +1,34 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Cortex Knowledge Assistant - Funding Configuration
+# ══════════════════════════════════════════════════════════════════════════════
+# This file enables the "Sponsor" button on the GitHub repository
+# Uncomment the platforms you want to use for receiving sponsorships
+# ══════════════════════════════════════════════════════════════════════════════
+
+# GitHub Sponsors username
+# github: [your-github-username]
+
+# Patreon username
+# patreon: your-patreon-username
+
+# Open Collective username
+# open_collective: your-opencollective-username
+
+# Ko-fi username
+# ko_fi: your-kofi-username
+
+# Buy Me a Coffee username
+# buy_me_a_coffee: your-buymeacoffee-username
+
+# Liberapay username
+# liberapay: your-liberapay-username
+
+# Custom sponsorship URLs (up to 4)
+# custom: ["https://your-custom-link.com"]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Instructions:
+# 1. Uncomment the platform(s) you want to use
+# 2. Replace the placeholder with your actual username
+# 3. Commit and push to see the "Sponsor" button on your repo
+# ──────────────────────────────────────────────────────────────────────────────

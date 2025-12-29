@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cka-api
+  labels:
+    app: cka-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cka-api
+  template:
+    metadata:
+      labels:
+        app: cka-api
+    spec:
+      containers:
+        - name: api
+          image: cka-api:latest
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: cka-api-config
+            - secretRef:
+                name: cka-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
