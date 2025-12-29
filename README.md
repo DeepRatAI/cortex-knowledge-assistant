@@ -4,6 +4,7 @@
 
 ### Enterprise-Grade RAG System with Real-Time Streaming
 
+[![Pipeline de Integración Continua](https://github.com/DeepRatAI/cortex-knowledge-assistant/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/DeepRatAI/cortex-knowledge-assistant/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0--beta-blue.svg)](https://github.com/DeepRatAI/cortex-knowledge-assistant/releases)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
@@ -33,6 +34,16 @@ A diferencia de implementaciones RAG básicas, Cortex está diseñado desde cero
 - **Stack completo de observabilidad** (métricas, logs, trazas)
 
 > **Pruébalo ahora**: Visita la [demo en vivo](https://cortex.deeprat.tech) para ver Cortex en acción con un corpus bancario pre-cargado.
+
+<div align="center">
+
+### Demo en Vivo
+
+<img src="docs/images/alum_livedemo.gif" alt="Demo de Cortex - Consulta sobre distribución de Poisson" width="700"/>
+
+*Usuario con rol alumno consultando sobre distribución de Poisson*
+
+</div>
 
 ---
 
