@@ -1,8 +1,6 @@
 <div align="center">
 
-# Cortex Knowledge Assistant
-
-### Enterprise-Grade RAG System with Real-Time Streaming
+<img src="docs/images/cortex-banner.png" alt="Cortex Knowledge Assistant" width="800"/>
 
 [![Pipeline de Integración Continua](https://github.com/DeepRatAI/cortex-knowledge-assistant/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/DeepRatAI/cortex-knowledge-assistant/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0--beta-blue.svg)](https://github.com/DeepRatAI/cortex-knowledge-assistant/releases)
@@ -41,7 +39,7 @@ A diferencia de implementaciones RAG básicas, Cortex está diseñado desde cero
 
 <img src="docs/images/alum_livedemo.gif" alt="Demo de Cortex - Consulta sobre distribución de Poisson" width="700"/>
 
-*Usuario con rol alumno consultando sobre distribución de Poisson*
+_Usuario con rol alumno consultando sobre distribución de Poisson_
 
 </div>
 
